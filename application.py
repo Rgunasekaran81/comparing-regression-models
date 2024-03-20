@@ -11,9 +11,25 @@ if(csvfile != None):
                         "Lasso Regression",
                         "Xgboost Regression",
                         "Random Forest Regression"]
-    
-    model = comparison(dataframe, dataframe.columns[-1])
-    st.write(model.RegressionModels(availablemodel))
+    checkboxes = st.columns(2)
+    trackcheckbox = {} 
+    with checkboxes[0]:
+        st.write("select dependent attributes")
+    for label in dataframe.columns:
+        with checkboxes[0]:
+            trackcheckbox[label+"0"] = st.checkbox(label=label, key=label+"0")
+             
+    with checkboxes[1]:
+        st.write("select independent attributes")
+    for label in dataframe.columns:
+        with checkboxes[1]:
+            trackcheckbox[label+"1"] = st.checkbox(label=label, key=label+"1")
+
+    attributeselected = False
+    dependent = []
+    independent = None
+   # model = comparison(dataframe, dataframe.columns[-1])
+    #st.write(model.RegressionModels(availablemodel))
 
     
 
