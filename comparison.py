@@ -15,9 +15,10 @@ from sklearn.ensemble import RandomForestRegressor
 
 class comparison:
 
-    def __init__(self, dataframe: pd, dependent:str, dropattribute:list[str]=[], test_size=0.2, cvepoch:int=None, lassoalpha:float=0.1) -> None:
+    def __init__(self, dataframe: pd, dependent:list[str], independent:str, dropattribute:list[str]=[], test_size=0.2, cvepoch:int=None, lassoalpha:float=0.1) -> None:
         self.dataframe = dataframe.drop(dropattribute, axis=1)
         self.dependent  = dependent
+        self.independent = independent
         self.cvepoch = cvepoch
 
         self.ridge_model = Ridge(True)
@@ -35,7 +36,7 @@ class comparison:
         #self.datafromat = self.cleandata()
 
         X = self.dataframe.drop(self.dependent, axis=1)
-        y = self.dataframe[self.dependent]
+        y = self.dataframe[self.independent]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=test_size, random_state=1)
 
     def eval_metrices(self, actual, pred) -> list[float]:
