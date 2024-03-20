@@ -78,10 +78,4 @@ class comparison:
         return [self.randomforest_reg, self.eval_metrices(self.y_test, y_pred), cval_score]
 
 
-df = pd.read_csv(r'D:\Projects\Comparing-Regression-Model\dataset\Admission_Predict.csv')
-train = comparison(df, dependent='Chance of Admit ')
-print(train.RandomForestReg())
-print(train.LinearReg())
-print(train.LassoReg())
-print(train.RidgeReg())
-print(train.XgboostReg())
+
