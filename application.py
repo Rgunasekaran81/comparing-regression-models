@@ -5,7 +5,6 @@ import streamlit.components.v1 as components
 import json
 st.set_page_config(layout="wide")
 
-print("test")
 csvfile = st.file_uploader(type="csv", label="upload csv file", accept_multiple_files=False)
 if(csvfile != None):
 
@@ -128,9 +127,7 @@ if(csvfile != None):
             const fs = require('fs');
             var data = {'dependent': dependent, 'independent': independent, 'drop': drop};
             data = JSON.stringfy(data);
-            fs.writefile('api.json', data, (error)=>{
-
-            }); 
+            console.log(data);
             """
         javascript = f"<script>parent.document.getElementsByTagName('iframe')[1].hidden='hidden';{code}</script>"
         components.html(javascript)
@@ -140,18 +137,22 @@ if(csvfile != None):
             if(val):
                 modelist.append(key)
 
-        dependent = None
-        independent = []
+        dependent = dataframe.columns[-1]
+        independent = dataframe.columns[:-1]
         drop = []
-        with open("api.json", 'r') as api:
-            data = json.load(api)
-            dependent = data["dependent"]
-            independent = data["independent"]
-            drop = data["drop"]
+        #with open("api.json", 'r') as api:
+        #    data = json.load(api)
+        #    dependent = data["dependent"]
+        #    independent = data["independent"]
+        #    drop = data["drop"]
 
 
-        model = comparison(dataframe, dependent=dependent, independent=independent)
-        st.write(model.RegressionModels(availablemodel))
-
+        model = comparison(dataframe, dependent=dependent, independent=independent, usermodellist=modelist, dropattribute=drop)
     
-
+        tab1, tab2, tab3 = st.tabs(["Histogram", "Boxplot", "Heatmap"])
+        with tab1:
+            st.plotly_chart(model.plotgraph()[0], use_container_width=True)
+        with tab2:
+            st.plotly_chart(model.plotgraph()[1], use_container_width=True)
+        with tab3:
+            st.plotly_chart(model.plotgraph()[2], use_container_width=True)

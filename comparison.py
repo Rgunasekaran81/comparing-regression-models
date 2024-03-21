@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_sc
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.figure_factory as ff
+import plotly.express as pe
 
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LinearRegression
@@ -15,10 +17,11 @@ from sklearn.ensemble import RandomForestRegressor
 
 class comparison:
 
-    def __init__(self, dataframe: pd, dependent:list[str], independent:str, dropattribute:list[str]=[], test_size=0.2, cvepoch:int=None, lassoalpha:float=0.1) -> None:
+    def __init__(self, dataframe: pd, dependent:list[str], independent:str, usermodellist:list[str], dropattribute:list[str]=[], test_size=0.2, cvepoch:int=None, lassoalpha:float=0.1) -> None:
         self.dataframe = dataframe.drop(dropattribute, axis=1)
         self.dependent  = dependent
         self.independent = independent
+        self.usermodellist = usermodellist
         self.cvepoch = cvepoch
 
         self.ridge_model = Ridge(True)
@@ -67,12 +70,12 @@ class comparison:
                 self.dataframe[col] = self.dataframe[col].apply(value_map, valuemap=valuemap)
         return changein
 
-    def RegressionModels(self, usermodellist:list[str]) -> dict[str:list]:
+    def RegressionModels(self) -> dict[str:list]:
         modeldata = {}
-        for model in usermodellist:
+        for model in self.usermodellist:
             curmodel = self.modelist[model]
             curmodel.fit(self.X_train, self.y_train)
-            y_pred = self.ridge_model.predict(self.X_test)
+            y_pred = curmodel.predict(self.X_test)
 
             cval_score = self.crossvalidation(curmodel, self.X_train, self.y_train)
             modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score]
@@ -87,3 +90,10 @@ class comparison:
             modelprediction[model] = [prediction, confidence]
         
         return modelprediction
+
+    def plotgraph(self):
+        figs = []
+        figs.append(ff.create_distplot([self.dataframe[c] for c in self.dataframe.columns], self.dataframe.columns))
+        figs.append(pe.box(self.dataframe))
+        figs.append(pe.imshow(self.dataframe.corr(), text_auto=True))
+        return figs
