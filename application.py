@@ -70,11 +70,28 @@ if(csvfile != None):
                     }
                 });
                     '''
-        javascript = f'<script>parent.document.getElementsByTagName("iframe")[0].hidden="hidden";{code}</script>'
-        components.html(javascript)
+        
+        with checkboxes[0]:
+            st.write("##")
+            st.write("Select Regression models")
+            modelside = ''
+            for models in availablemodel:
+                id = models.replace(" ", "")
+                modelside += f'''<input type="checkbox" id="{id}"> <label for={id}>{models}</label> <br>'''
+                code += f"parent.document.getElementById('{id}').checked = true;"
+            st.markdown(modelside, unsafe_allow_html=True)
+            javascript = f'<script>parent.document.getElementsByTagName("iframe")[0].hidden="hidden";{code}</script>'
+            components.html(javascript)
 
-    #model = comparison(dataframe, dependent=dependent, independent=independent)
-    #st.write(model.RegressionModels(availablemodel))
+        with checkboxes[1]:
+            st.write("#")
+            st.write("#")
+            st.write("#")
+            start = st.button("Start", type="primary")
+    
+    if(start):
+        model = comparison(dataframe, dependent=dependent, independent=independent)
+        st.write(model.RegressionModels(availablemodel))
 
     
 
