@@ -124,7 +124,14 @@ if(csvfile != None):
                 }
                 """
         
-        code += "console.log(independent); console.log(dependent); console.log(drop);"
+        code += """
+            const fs = require('fs');
+            var data = {'dependent': dependent, 'independent': independent, 'drop': drop};
+            data = JSON.stringfy(data);
+            fs.writefile('api.json', data, (error)=>{
+
+            }); 
+            """
         javascript = f"<script>parent.document.getElementsByTagName('iframe')[1].hidden='hidden';{code}</script>"
         components.html(javascript)
 
