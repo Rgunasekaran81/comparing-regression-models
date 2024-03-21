@@ -2,6 +2,7 @@ from comparison import comparison
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
+import json
 st.set_page_config(layout="wide")
 
 print("test")
@@ -70,26 +71,78 @@ if(csvfile != None):
                     }
                 });
                     '''
-        
+
+        javascript = f'<script>parent.document.getElementsByTagName("iframe")[0].hidden="hidden";{code}</script>'
+        components.html(javascript)
+
+        modeltrack = {}
         with checkboxes[0]:
-            st.write("##")
+            st.write("#")
+            st.write("#")
+            st.write("#")
             st.write("Select Regression models")
-            modelside = ''
-            for models in availablemodel:
-                id = models.replace(" ", "")
-                modelside += f'''<input type="checkbox" id="{id}"> <label for={id}>{models}</label> <br>'''
-                code += f"parent.document.getElementById('{id}').checked = true;"
-            st.markdown(modelside, unsafe_allow_html=True)
-            javascript = f'<script>parent.document.getElementsByTagName("iframe")[0].hidden="hidden";{code}</script>'
-            components.html(javascript)
+            for label in availablemodel:
+                modeltrack[label] = st.checkbox(label=label, value=True)
+            
 
         with checkboxes[1]:
             st.write("#")
             st.write("#")
             st.write("#")
-            start = st.button("Start", type="primary")
+            st.write("##")
+            start = st.button("Start", type="primary", key="stren")
+            st.write("#")
+            stop = st.empty()
+            stop.button("Stop", type="primary", disabled=True, key="stdis")
+
     
     if(start):
+        with checkboxes[1]:
+            stop = stop.button("Stop", type="primary", key="sten")
+
+        code = """
+            var dependent = null;
+            var independent = [];
+            var drop = []
+            """
+        for label in dataframe.columns:
+            id = label.replace(" ", "")
+            code += f"if(parent.document.getElementById('{id}in').checked)"
+            code += """
+                {
+                    independent.push('"""+label+"""');
+                }
+                else
+                {
+                    drop.push('"""+label+"""');
+                }
+                """
+            code += f"if(parent.document.getElementById('{id}de').checked)"
+            code += """
+                {
+                    dependent = '"""+label+"""';
+                }
+                """
+        
+        code += "console.log(independent); console.log(dependent); console.log(drop);"
+        javascript = f"<script>parent.document.getElementsByTagName('iframe')[1].hidden='hidden';{code}</script>"
+        components.html(javascript)
+
+        modelist = []
+        for key, val in modeltrack.items():
+            if(val):
+                modelist.append(key)
+
+        dependent = None
+        independent = []
+        drop = []
+        with open("api.json", 'r') as api:
+            data = json.load(api)
+            dependent = data["dependent"]
+            independent = data["independent"]
+            drop = data["drop"]
+
+
         model = comparison(dataframe, dependent=dependent, independent=independent)
         st.write(model.RegressionModels(availablemodel))
 
