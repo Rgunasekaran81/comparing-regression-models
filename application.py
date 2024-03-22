@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 import json
+
 st.set_page_config(layout="wide")
 
 csvfile = st.file_uploader(type="csv", label="upload csv file", accept_multiple_files=False)
@@ -26,53 +27,37 @@ if(csvfile != None):
         
         with checkboxes[0]:
             st.write("Independent Variable")
-            for label in dataframe.columns:
-                id = label.replace(" ","")+"in"
-                indeside += f'''<input type="checkbox" id="{id}"> <label for={id}>{label}</label> <br>'''
-            st.markdown(indeside, unsafe_allow_html=True)
-        
         with checkboxes[1]:
             st.write("Dependent Variable")
-            for label in dataframe.columns:
-                id = label.replace(" ","")+"de"
-                deside += f'''<input type="checkbox" id="{id}"> <label for={id}>{label}</label> <br>'''
-            st.markdown(deside, unsafe_allow_html=True)
-
-        code = ""            
+            
+        checkboxs = {}
         for label in dataframe.columns:
-            id1 = label.replace(" ","")
-            if(label != dataframe.columns[-1]):
-                code += '''
-                    parent.document.getElementById('''+'"'+id1+'in'+'"'+''').checked = true;
-                    parent.document.getElementById('''+'"'+id1+'de'+'"'+''').disabled = true;
-                        '''
-            else:
-                code += '''
-                    parent.document.getElementById('''+'"'+id1+'de'+'"'+''').checked = true;
-                    parent.document.getElementById('''+'"'+id1+'in'+'"'+''').disabled = true;
-                        '''
-            code += '''
-                checkboxin = parent.document.getElementById('''+'"'+id1+'in'+'"'+''');
-                checkboxin.addEventListener('change', function() {
-                    if (this.checked) {
-                        parent.document.getElementById('''+'"'+id1+'de'+'"'+''').disabled = true;
-                    } else {
-                        parent.document.getElementById('''+'"'+id1+'de'+'"'+''').disabled = false;
-                    }
-                });
-                checkboxde = parent.document.getElementById('''+'"'+id1+'de'+'"'+''');
-                checkboxde.addEventListener('change', function() {
-                    console.log(this.checked)
-                    if (this.checked) {
-                        parent.document.getElementById('''+'"'+id1+'in'+'"'+''').disabled = true;
-                    } else {
-                        parent.document.getElementById('''+'"'+id1+'in'+'"'+''').disabled = false;
-                    }
-                });
-                    '''
+            id = label.replace(" ","")
+            if(id+"in" not in st.session_state):
+                if(label != dataframe.columns[-1]):
+                    st.session_state[id+"in"] = True
+                else:
+                    st.session_state[id+"in"] = False
+            if(id+"de" not in st.session_state):
+                if(label != dataframe.columns[-1]):
+                    st.session_state[id+"de"] = False
+                else:
+                    st.session_state[id+"de"] = True
 
-        javascript = f'<script>parent.document.getElementsByTagName("iframe")[0].hidden="hidden";{code}</script>'
-        components.html(javascript)
+        for label in dataframe.columns:
+            id = label.replace(" ","")
+            with checkboxes[0]:
+                if(st.session_state[id+"de"]):
+                    checkboxs[id+"in"] = [st.checkbox(label=label, key=id+"in", disabled=True), label]
+                else:
+                    checkboxs[id+"in"] = [st.checkbox(label=label, key=id+"in"), label]
+            with checkboxes[1]:
+                if(st.session_state[id+"in"]):
+                    checkboxs[id+"de"] = [st.checkbox(label=label, key=id+"de", disabled=True), label]
+                else:
+                    checkboxs[id+"de"] = [st.checkbox(label=label, key=id+"de"), label]
+
+        #st.write(checkboxs)
 
         modeltrack = {}
         with checkboxes[0]:
@@ -93,62 +78,33 @@ if(csvfile != None):
             st.write("#")
             stop = st.empty()
             stop.button("Stop", type="primary", disabled=True, key="stdis")
-
-    
     if(start):
+        
         with checkboxes[1]:
             stop = stop.button("Stop", type="primary", key="sten")
-
-        code = """
-            var dependent = null;
-            var independent = [];
-            var drop = []
-            """
-        for label in dataframe.columns:
-            id = label.replace(" ", "")
-            code += f"if(parent.document.getElementById('{id}in').checked)"
-            code += """
-                {
-                    independent.push('"""+label+"""');
-                }
-                else
-                {
-                    drop.push('"""+label+"""');
-                }
-                """
-            code += f"if(parent.document.getElementById('{id}de').checked)"
-            code += """
-                {
-                    dependent = '"""+label+"""';
-                }
-                """
-        
-        code += """
-            const fs = require('fs');
-            var data = {'dependent': dependent, 'independent': independent, 'drop': drop};
-            data = JSON.stringfy(data);
-            console.log(data);
-            """
-        javascript = f"<script>parent.document.getElementsByTagName('iframe')[1].hidden='hidden';{code}</script>"
-        components.html(javascript)
 
         modelist = []
         for key, val in modeltrack.items():
             if(val):
                 modelist.append(key)
 
-        dependent = dataframe.columns[-1]
-        independent = dataframe.columns[:-1]
+        dependent = ""
+        independent = []
         drop = []
-        #with open("api.json", 'r') as api:
-        #    data = json.load(api)
-        #    dependent = data["dependent"]
-        #    independent = data["independent"]
-        #    drop = data["drop"]
+        for key, val in checkboxs.items():
+            if(val[0]):
+                if("de" in key):
+                    dependent = val[1]
+                if("in" in key):
+                    independent.append(val[1])
+            elif("in" in key):
+                drop.append(val[1])
+        
+        drop.remove(dependent)
+        
+        st.write(dependent)
+        model = comparison(dataframe, independent=independent, dependent=dependent, usermodellist=modelist, dropattribute=drop)
 
-
-        model = comparison(dataframe, dependent=dependent, independent=independent, usermodellist=modelist, dropattribute=drop)
-    
         tab1, tab2, tab3 = st.tabs(["Histogram", "Boxplot", "Heatmap"])
         with tab1:
             st.plotly_chart(model.plotgraph()[0], use_container_width=True)
@@ -156,3 +112,5 @@ if(csvfile != None):
             st.plotly_chart(model.plotgraph()[1], use_container_width=True)
         with tab3:
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
+        
+        st.write(model.RegressionModels())
