@@ -57,8 +57,6 @@ if(csvfile != None):
                 else:
                     checkboxs[id+"de"] = [st.checkbox(label=label, key=id+"de"), label]
 
-        #st.write(checkboxs)
-
         modeltrack = {}
         with checkboxes[0]:
             st.write("#")
@@ -68,25 +66,21 @@ if(csvfile != None):
             for label in availablemodel:
                 modeltrack[label] = st.checkbox(label=label, value=True)
             
-
         with checkboxes[1]:
             st.write("#")
             st.write("#")
             st.write("#")
             st.write("##")
-            start = st.button("Start", type="primary", key="stren")
+            start = [st.empty(), False]
+            start[1] = start[0].button("Start", type="primary", key="stren")
             st.write("#")
             stop = st.empty()
             stop.button("Stop", type="primary", disabled=True, key="stdis")
-    if(start):
-        
-        with checkboxes[1]:
-            stop = stop.button("Stop", type="primary", key="sten")
 
-        modelist = []
-        for key, val in modeltrack.items():
-            if(val):
-                modelist.append(key)
+    if(start[1]):
+        with checkboxes[1]:
+            start[0] = start[0].button("Start", type="primary", key="strdis", disabled=True)
+            stop.button("Stop", type="primary", key="sten")
 
         dependent = ""
         independent = []
@@ -99,10 +93,13 @@ if(csvfile != None):
                     independent.append(val[1])
             elif("in" in key):
                 drop.append(val[1])
-        
         drop.remove(dependent)
-        
-        st.write(dependent)
+
+        modelist = []
+        for key, val in modeltrack.items():
+            if(val):
+                modelist.append(key)
+
         model = comparison(dataframe, independent=independent, dependent=dependent, usermodellist=modelist, dropattribute=drop)
 
         tab1, tab2, tab3 = st.tabs(["Histogram", "Boxplot", "Heatmap"])
@@ -114,3 +111,7 @@ if(csvfile != None):
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         st.write(model.RegressionModels())
+
+        restart = stop.button("Restart", type="primary", key="reen")
+        if(restart):
+            start[1] = True
