@@ -5,7 +5,6 @@ from time import time
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_val_score
 
-import plotly.figure_factory as ff
 import plotly.express as pe
 
 from sklearn.linear_model import Ridge
@@ -35,7 +34,7 @@ class comparison:
                         "Random Forest Regression":self.randomforest_reg
                         }
 
-        #self.datafromat = self.cleandata()
+        self.dataframe = self.cleandata(self.dataframe)
 
         self.X = self.dataframe.drop(self.dependent, axis=1)
         self.y = self.dataframe[self.dependent]
@@ -52,22 +51,16 @@ class comparison:
         cv_score = cross_val_score(estimator=model_name, X = X_train, y = y_train, cv=self.cvepoch)
         return cv_score.mean()
 
-    def cleandata(self) -> dict[str:dict[str:int]]:
-        def value_map(x, valuemap) -> int:
-            for key, value in valuemap.items():
-                if(x == key):
-                    return value
-        changein = {}
-        for col in self.dataframe:
-            values = self.dataframe[col].unique()
+    def cleandata(self, dataframe:pd) -> pd:
+        for col in dataframe:
+            values = dataframe[col].unique()
             if(type(values[0]) == str):
-                valuemap = {}
-                for num, val in enumerate(values):
-                    valuemap[val] = num
-                changein[col] = valuemap
-                self.dataframe[col] = valuemap
-                self.dataframe[col] = self.dataframe[col].apply(value_map, valuemap=valuemap)
-        return changein
+                valuemap = []
+                for num in range(len(values)):
+                    valuemap.append(num)
+                dataframe[col].replace(values, valuemap, inplace=True)
+
+        return dataframe
 
     def RegressionModels(self) -> dict[str:list[float]]:
         modeldata = {}
@@ -94,7 +87,7 @@ class comparison:
 
     def plotgraph(self):
         figs = []
-        figs.append(ff.create_distplot([self.dataframe[c] for c in self.dataframe.columns], self.dataframe.columns))
+        figs.append(pe.histogram(self.dataframe, marginal="box"))
         figs.append(pe.box(self.dataframe))
         figs.append(pe.imshow(self.dataframe.corr(), text_auto=True))
         return figs
