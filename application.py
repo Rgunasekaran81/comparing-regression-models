@@ -1,8 +1,6 @@
 from comparison import comparison
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
-import json
 
 st.set_page_config(layout="wide")
 
@@ -111,6 +109,8 @@ if(csvfile != None):
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         st.write(model.RegressionModels())
+        
+        model.savemodel("Ridge Regression")
 
         restart = stop.button("Restart", type="primary", key="reen")
         if(restart):
