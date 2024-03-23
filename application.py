@@ -110,7 +110,33 @@ if(csvfile != None):
         with tab3:
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
-        st.write(model.RegressionModels())
+        model_result = model.RegressionModels()
+        Col1 = st.columns(3)
+        col2 = st.columns(2)
+        
+        for i in range(3):
+            with Col1[i]:  
+                scores = list(model_result.values())[i]
+                st.write(list(model_result.keys())[i])
+                container = st.container(border=True)
+                container.write(f"Root Mean Squared Error: {scores[1][0]}")
+                container.write(f"Mean Absolute Error: {scores[1][1]}")
+                container.write(f"Mean Squared Error: {scores[1][2]}")
+                container.write(f"R-squared :{scores[1][3]}")
+                container.write(f"Cross validation: {scores[2]}")
+        
+        for i in range(3,5):
+            with Col1[3-i]:  
+                scores = list(model_result.values())[i]
+                st.write(list(model_result.keys())[i])
+                container = st.container(border=True)
+                container.write(f"Root Mean Squared Error: {scores[1][0]}")
+                container.write(f"Mean Absolute Error: {scores[1][1]}")
+                container.write(f"Mean Squared Error: {scores[1][2]}")
+                container.write(f"R-squared :{scores[1][3]}")
+                container.write(f"Cross validation: {scores[2]}")
+        
+        
 
         restart = stop.button("Restart", type="primary", key="reen")
         if(restart):
