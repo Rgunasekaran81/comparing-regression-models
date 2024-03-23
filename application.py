@@ -1,8 +1,6 @@
 from comparison import comparison
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
-import json
 
 st.set_page_config(layout="wide")
 
@@ -135,8 +133,7 @@ if(csvfile != None):
                 container.write(f"Mean Squared Error: {scores[1][2]}")
                 container.write(f"R-squared :{scores[1][3]}")
                 container.write(f"Cross validation: {scores[2]}")
-        
-        
+
 
         restart = stop.button("Restart", type="primary", key="reen")
         if(restart):

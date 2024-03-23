@@ -1,11 +1,10 @@
 import pandas as pd
-import  numpy as np
+from numpy import sqrt, max
+from time import time
 
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.model_selection import train_test_split, cross_val_score
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.figure_factory as ff
 import plotly.express as pe
 
@@ -43,7 +42,7 @@ class comparison:
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size, random_state=1)
 
     def eval_metrices(self, actual, pred) -> list[float]:
-        rmse = np.sqrt(mean_squared_error(actual, pred))
+        rmse = sqrt(mean_squared_error(actual, pred))
         mae = mean_absolute_error(actual, pred)
         mse = mean_squared_error(actual, pred)
         score = r2_score(actual, pred)
@@ -70,15 +69,17 @@ class comparison:
                 self.dataframe[col] = self.dataframe[col].apply(value_map, valuemap=valuemap)
         return changein
 
-    def RegressionModels(self) -> dict[str:list]:
+    def RegressionModels(self) -> dict[str:list[float]]:
         modeldata = {}
         for model in self.usermodellist:
             curmodel = self.modelist[model]
+            start = time()
             curmodel.fit(self.X_train, self.y_train)
+            end = time()-start
             y_pred = curmodel.predict(self.X_test)
 
             cval_score = self.crossvalidation(curmodel, self.X_train, self.y_train)
-            modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score]
+            modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score, end]
         
         return modeldata
 
@@ -86,7 +87,7 @@ class comparison:
         modelprediction = {}
         for model in usermodelist:
             prediction = self.modelist[model].predict(data)
-            confidence = round(100 * (np.max(prediction[0])), 2)
+            confidence = round(100 * (max(prediction[0])), 2)
             modelprediction[model] = [prediction, confidence]
         
         return modelprediction
@@ -97,3 +98,9 @@ class comparison:
         figs.append(pe.box(self.dataframe))
         figs.append(pe.imshow(self.dataframe.corr(), text_auto=True))
         return figs
+
+    def savemodel(self, model):
+        filename = f"{model}.pkl"
+        self.modelist[model].save(filename)
+
+        return filename
