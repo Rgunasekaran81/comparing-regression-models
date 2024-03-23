@@ -109,30 +109,46 @@ if(csvfile != None):
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         model_result = model.RegressionModels()
-        Col1 = st.columns(3)
-        col2 = st.columns(2)
+        Col1 = st.columns([15, 15, 15])
         
         for i in range(3):
-            with Col1[i]:  
+            with Col1[i]:
+                btncols = st.columns([5, 5, 5])
+                
+                with btncols[0]:
+                    st.write(list(model_result.keys())[i])
+                with btncols[1]:
+                    st.button(label="compare", key=i)
+                with btncols[2]:
+                    st.button(label="download", key=i+10)
+                
                 scores = list(model_result.values())[i]
-                st.write(list(model_result.keys())[i])
                 container = st.container(border=True)
-                container.write(f"Root Mean Squared Error: {scores[1][0]}")
-                container.write(f"Mean Absolute Error: {scores[1][1]}")
-                container.write(f"Mean Squared Error: {scores[1][2]}")
-                container.write(f"R-squared :{scores[1][3]}")
-                container.write(f"Cross validation: {scores[2]}")
+                container.write(f":blue[**Root Mean Squared Error:**] {scores[1][0]}")
+                container.write(f":blue[**Mean Absolute Error:**]     {scores[1][1]}")
+                container.write(f":blue[**Mean Squared Error:**]      {scores[1][2]}")
+                container.write(f":blue[**R-squared:**]               {scores[1][3]}")
+                container.write(f":blue[**Cross validation:**]        {scores[2]}")
+                container.write(f":blue[**Time take to train:**]      {scores[3]}")
         
         for i in range(3,5):
-            with Col1[3-i]:  
+            with Col1[3-i]:
+                btncols = st.columns([5, 5, 5])
+                with btncols[0]:
+                    st.write(list(model_result.keys())[i])
+                with btncols[1]:
+                    st.button(label="compare", key=i)
+                with btncols[2]:
+                    st.button(label="download", key=i+10)
+
                 scores = list(model_result.values())[i]
-                st.write(list(model_result.keys())[i])
                 container = st.container(border=True)
-                container.write(f"Root Mean Squared Error: {scores[1][0]}")
-                container.write(f"Mean Absolute Error: {scores[1][1]}")
-                container.write(f"Mean Squared Error: {scores[1][2]}")
-                container.write(f"R-squared :{scores[1][3]}")
-                container.write(f"Cross validation: {scores[2]}")
+                container.write(f":blue[**Root Mean Squared Error:**] {scores[1][0]}")
+                container.write(f":blue[**Mean Absolute Error:**]     {scores[1][1]}")
+                container.write(f":blue[**Mean Squared Error:**]      {scores[1][2]}")
+                container.write(f":blue[**R-squared:**]               {scores[1][3]}")
+                container.write(f":blue[**Cross validation:**]        {scores[2]}")
+                container.write(f":blue[**Time take to train:**]      {scores[3]}")
 
 
         restart = stop.button("Restart", type="primary", key="reen")
