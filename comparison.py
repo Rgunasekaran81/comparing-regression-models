@@ -94,7 +94,7 @@ class comparison:
         return figs
 
     def savemodel(self, model):
-        filename = f"{model}.pkl"
+        filename = f"tempmodelsave\{model}.pkl"
         with open(filename, "wb") as file:
             pickle.dump(self.modelist[model], file)
             
