@@ -110,19 +110,18 @@ if(csvfile != None):
         
         model_result = model.RegressionModels()
 
-        Col1 = st.columns([15, 15, 15])
-        
-        for i in range(3):
-            with Col1[i]:
-                btncols = st.columns([5, 5, 5])
+        Col1 = st.columns([14, 14, 14])
+        Col2 = st.columns([14, 14, 14])
+
+        def displayresult(i, j, Col):
+            with Col[(i-j)]:
+                btncols = st.columns([7, 7])
                 
                 with btncols[0]:
                     st.write(list(model_result.keys())[i])
                 with btncols[1]:
-                    st.button(label="compare", key=i)
-                with btncols[2]:
                     filename = model.savemodel(list(model_result.keys())[i])
-                    with open(filename, "rb") as file:
+                    with open(f"tempmodelsave\{filename}", "rb") as file:
                         st.download_button(label="Download", data=file, file_name=filename)
                 
                 scores = list(model_result.values())[i]
@@ -133,28 +132,18 @@ if(csvfile != None):
                 container.write(f":blue[**R-squared:**]               {scores[1][3]}")
                 container.write(f":blue[**Cross validation:**]        {scores[2]}")
                 container.write(f":blue[**Time take to train:**]      {scores[3]}")
+
+        for i in range(3):
+            try:
+                displayresult(i, 0, Col1)
+            except:
+                pass
         
         for i in range(3,5):
-            with Col1[3-i]:
-                btncols = st.columns([5, 5, 5])
-                with btncols[0]:
-                    st.write(list(model_result.keys())[i])
-                with btncols[1]:
-                    st.button(label="compare", key=i)
-                with btncols[2]:
-                    filename = model.savemodel(list(model_result.keys())[i])
-                    with open(filename, "rb") as file:
-                        st.download_button(label="Download", data=file, file_name=filename)
-                
-
-                scores = list(model_result.values())[i]
-                container = st.container(border=True)
-                container.write(f":blue[**Root Mean Squared Error:**] {scores[1][0]}")
-                container.write(f":blue[**Mean Absolute Error:**]     {scores[1][1]}")
-                container.write(f":blue[**Mean Squared Error:**]      {scores[1][2]}")
-                container.write(f":blue[**R-squared:**]               {scores[1][3]}")
-                container.write(f":blue[**Cross validation:**]        {scores[2]}")
-                container.write(f":blue[**Time take to train:**]      {scores[3]}")
+            try:
+                displayresult(i, 3, Col2)
+            except:
+                pass
 
 
         restart = stop.button("Restart", type="primary", key="reen")
