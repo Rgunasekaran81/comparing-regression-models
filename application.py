@@ -109,6 +109,7 @@ if(csvfile != None):
             st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         model_result = model.RegressionModels()
+
         Col1 = st.columns([15, 15, 15])
         
         for i in range(3):
@@ -120,7 +121,9 @@ if(csvfile != None):
                 with btncols[1]:
                     st.button(label="compare", key=i)
                 with btncols[2]:
-                    st.button(label="download", key=i+10)
+                    filename = model.savemodel(list(model_result.keys())[i])
+                    with open(filename, "rb") as file:
+                        st.download_button(label="Download", data=file, file_name=filename)
                 
                 scores = list(model_result.values())[i]
                 container = st.container(border=True)
@@ -139,7 +142,10 @@ if(csvfile != None):
                 with btncols[1]:
                     st.button(label="compare", key=i)
                 with btncols[2]:
-                    st.button(label="download", key=i+10)
+                    filename = model.savemodel(list(model_result.keys())[i])
+                    with open(filename, "rb") as file:
+                        st.download_button(label="Download", data=file, file_name=filename)
+                
 
                 scores = list(model_result.values())[i]
                 container = st.container(border=True)

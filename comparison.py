@@ -1,6 +1,7 @@
 import pandas as pd
 from numpy import sqrt, max
 from time import time
+import pickle
 
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -94,6 +95,7 @@ class comparison:
 
     def savemodel(self, model):
         filename = f"{model}.pkl"
-        self.modelist[model].save(filename)
-
+        with open(filename, "wb") as file:
+            pickle.dump(self.modelist[model], file)
+            
         return filename
