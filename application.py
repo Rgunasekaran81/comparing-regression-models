@@ -145,6 +145,10 @@ if(csvfile != None):
             except:
                 pass
 
+        st.plotly_chart(model.comparisongraph(list(model_result.values())), use_container_width=True)
+
+
+        
 
         restart = stop.button("Restart", type="primary", key="reen")
         if(restart):

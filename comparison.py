@@ -99,3 +99,8 @@ class comparison:
             pickle.dump(self.modelist[model], file)
             
         return filename
+    
+    def comparisongraph(self, modelresult):
+        strresult = [modelresult[1][0], modelresult[1][1], modelresult[1][2], modelresult[1][3], modelresult[2], modelresult[3]]
+        fig = pe.bar(strresult)
+        return fig
