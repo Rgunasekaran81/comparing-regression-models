@@ -69,11 +69,13 @@ class comparison:
             curmodel = self.modelist[model]
             start = time()
             curmodel.fit(self.X_train, self.y_train)
-            end = time()-start
+            endt = time()-start
+            start = time()
             y_pred = curmodel.predict(self.X_test)
+            endp = time()-start
 
             cval_score = self.crossvalidation(curmodel, self.X_train, self.y_train)
-            modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score, end]
+            modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score, endt*100, endp*100]
         
         return modeldata
 
@@ -101,6 +103,19 @@ class comparison:
         return filename
     
     def comparisongraph(self, modelresult):
-        strresult = [modelresult[1][0], modelresult[1][1], modelresult[1][2], modelresult[1][3], modelresult[2], modelresult[3]]
-        fig = pe.bar(strresult)
+        strdata = []
+        for key, val in modelresult.items():
+            strdata.append({"MODEL":key,
+                            "RMSE":val[1][0], 
+                            "MAE":val[1][1], 
+                            "MSE":val[1][2], 
+                            "R2S":val[1][3], 
+                            "CVS":val[2], 
+                            "TIME TO TRAIN":val[3], 
+                            "TIME TO PRED":val[4]
+                            })
+            
+        strresult = pd.DataFrame(strdata)
+        print(strresult)
+        fig = pe.bar(strresult, x="MODEL", y=strresult.columns[1:])
         return fig

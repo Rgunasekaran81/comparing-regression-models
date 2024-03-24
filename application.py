@@ -126,12 +126,13 @@ if(csvfile != None):
                 
                 scores = list(model_result.values())[i]
                 container = st.container(border=True)
-                container.write(f":blue[**Root Mean Squared Error:**] {scores[1][0]}")
-                container.write(f":blue[**Mean Absolute Error:**]     {scores[1][1]}")
-                container.write(f":blue[**Mean Squared Error:**]      {scores[1][2]}")
-                container.write(f":blue[**R-squared:**]               {scores[1][3]}")
-                container.write(f":blue[**Cross validation:**]        {scores[2]}")
-                container.write(f":blue[**Time take to train:**]      {scores[3]}")
+                container.write(f":blue[**Root Mean Squared Error:**]     {scores[1][0]}")
+                container.write(f":blue[**Mean Absolute Error:**]         {scores[1][1]}")
+                container.write(f":blue[**Mean Squared Error:**]          {scores[1][2]}")
+                container.write(f":blue[**R-squared:**]                   {scores[1][3]}")
+                container.write(f":blue[**Cross validation:**]            {scores[2]}")
+                container.write(f":blue[**Time take to train (x100):**]   {scores[3]}")
+                container.write(f":blue[**Time take to predict (x100):**] {scores[4]}")
 
         for i in range(3):
             try:
@@ -145,11 +146,8 @@ if(csvfile != None):
             except:
                 pass
 
-        st.plotly_chart(model.comparisongraph(list(model_result.values())), use_container_width=True)
-
-
+        st.plotly_chart(model.comparisongraph(model_result), use_container_width=True)
         
-
         restart = stop.button("Restart", type="primary", key="reen")
         if(restart):
             start[1] = True
