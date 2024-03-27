@@ -34,6 +34,7 @@ class comparison:
                         "Xgboost Regression":self.xgboost_model,
                         "Random Forest Regression":self.randomforest_reg
                         }
+        self.bestmodel = []
 
         self.dataframe = self.cleandata(self.dataframe)
 
@@ -60,7 +61,7 @@ class comparison:
                 for num in range(len(values)):
                     valuemap.append(num)
                 dataframe[col].replace(values, valuemap, inplace=True)
-
+        dataframe.fillna(0)
         return dataframe
 
     def RegressionModels(self) -> dict[str:list[float]]:
@@ -75,7 +76,13 @@ class comparison:
             endp = time()-start
 
             cval_score = self.crossvalidation(curmodel, self.X_train, self.y_train)
-            modeldata[model] = [curmodel, self.eval_metrices(self.y_test, y_pred), cval_score, endt*100, endp*100]
+            eval_score = self.eval_metrices(self.y_test, y_pred)
+            modeldata[model] = [curmodel, eval_score, cval_score, endt*100, endp*100]
+            if(len(self.bestmodel) == 0):
+                self.bestmodel = [model, modeldata[model]]
+            else:
+                if(self.bestmodel[1][1][3] < eval_score[3]):
+                    self.bestmodel = [model, modeldata[model]]
         
         return modeldata
 
@@ -91,7 +98,6 @@ class comparison:
     def plotgraph(self):
         figs = []
         figs.append(pe.histogram(self.dataframe, marginal="box"))
-        figs.append(pe.box(self.dataframe))
         figs.append(pe.imshow(self.dataframe.corr(), text_auto=True))
         return figs
 
@@ -116,6 +122,5 @@ class comparison:
                             })
             
         strresult = pd.DataFrame(strdata)
-        print(strresult)
         fig = pe.bar(strresult, x="MODEL", y=strresult.columns[1:])
         return fig
