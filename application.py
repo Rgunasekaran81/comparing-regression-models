@@ -100,13 +100,11 @@ if(csvfile != None):
 
         model = comparison(dataframe, independent=independent, dependent=dependent, usermodellist=modelist, dropattribute=drop)
 
-        tab1, tab2, tab3 = st.tabs(["Histogram", "Boxplot", "Heatmap"])
+        tab1, tab2 = st.tabs(["Histogram", "Heatmap"])
         with tab1:
             st.plotly_chart(model.plotgraph()[0], use_container_width=True)
         with tab2:
             st.plotly_chart(model.plotgraph()[1], use_container_width=True)
-        with tab3:
-            st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         model_result = model.RegressionModels()
 
@@ -145,7 +143,8 @@ if(csvfile != None):
                 displayresult(i, 3, Col2)
             except:
                 pass
-
+        st.write('#')
+        st.write(f"Best performing model is **{model.bestmodel[0]}** with accuracy score of **{model.bestmodel[1][1][3]}**")
         st.plotly_chart(model.comparisongraph(model_result), use_container_width=True)
         
         restart = stop.button("Restart", type="primary", key="reen")
