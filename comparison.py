@@ -91,7 +91,6 @@ class comparison:
     def plotgraph(self):
         figs = []
         figs.append(pe.histogram(self.dataframe, marginal="box"))
-        figs.append(pe.box(self.dataframe))
         figs.append(pe.imshow(self.dataframe.corr(), text_auto=True))
         return figs
 

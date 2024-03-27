@@ -100,13 +100,11 @@ if(csvfile != None):
 
         model = comparison(dataframe, independent=independent, dependent=dependent, usermodellist=modelist, dropattribute=drop)
 
-        tab1, tab2, tab3 = st.tabs(["Histogram", "Boxplot", "Heatmap"])
+        tab1, tab2 = st.tabs(["Histogram", "Heatmap"])
         with tab1:
             st.plotly_chart(model.plotgraph()[0], use_container_width=True)
         with tab2:
             st.plotly_chart(model.plotgraph()[1], use_container_width=True)
-        with tab3:
-            st.plotly_chart(model.plotgraph()[2], use_container_width=True)
         
         model_result = model.RegressionModels()
 
